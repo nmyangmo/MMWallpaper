@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import com.yangmo.mmwallpaper.base.MyImageLoader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,8 +114,67 @@ public class ImageFlowFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
 
-        recyclerView = (RecyclerView) getActivity().findViewById(R.id.recyclerView);
+    private class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+
+        private ArrayList<String> dataList;
+
+        public MyAdapter(ArrayList<String> dataList) {
+            this.dataList = dataList;
+            Log.e("ykl", Arrays.toString(dataList.toArray()));
+            Log.e("ykl",dataList.toString());
+        }
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_image_layout, parent, false);
+            MyViewHolder holder = new MyViewHolder(view);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            //设置图片大小
+            ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+            params.height = heightList.get(position);
+            holder.itemView.setLayoutParams(params);
+
+            holder.iv.setImageBitmap(null);
+            //防止图片错位
+            holder.iv.setTag(dataList.get(position));
+            imageLoader.add(new MyImageLoader.ImageBean(holder.iv, dataList.get(position)));
+        }
+
+        @Override
+        public int getItemCount() {
+            return dataList.size();
+        }
+
+        class MyViewHolder extends RecyclerView.ViewHolder {
+            public ImageView iv;
+
+            public MyViewHolder(View itemView) {
+                super(itemView);
+                iv = (ImageView) itemView.findViewById(R.id.iv);
+            }
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_image_flow, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        initView(view);
+    }
+
+    private void initView(View view) {
+        recyclerView =view.findViewById(R.id.recyclerView);
 
         imageLoader = new MyImageLoader(mHandler) {
             @Override
@@ -132,7 +194,8 @@ public class ImageFlowFragment extends Fragment {
         //抓取图片
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("http://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&ie=gbk&word=%C3%C0%C5%AE&ala=1&fr=ala&alatpl=cover&pos=0#z=0&pn=&ic=0&st=-1&face=0&s=0&lm=-1")
+//                .url("http://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&ie=gbk&word=%C3%C0%C5%AE&ala=1&fr=ala&alatpl=cover&pos=0#z=0&pn=&ic=0&st=-1&face=0&s=0&lm=-1")
+                .url("https://image.baidu.com/search/index?tn=baiduimage&ct=201326592&lm=-1&cl=2&ie=gbk&word=%B7%E7%BE%B0%CD%BC%C6%AC&fr=ala&ala=1&alatpl=adress&pos=0&hs=2&xthttps=111111")
                 .build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
@@ -200,56 +263,6 @@ public class ImageFlowFragment extends Fragment {
         });
 
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(COLNUM, StaggeredGridLayoutManager.VERTICAL));
-    }
-
-    private class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-
-        private ArrayList<String> dataList;
-
-        public MyAdapter(ArrayList<String> dataList) {
-            this.dataList = dataList;
-        }
-
-        @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getContext()).inflate(R.layout.item_image_layout, parent, false);
-            MyViewHolder holder = new MyViewHolder(view);
-            return holder;
-        }
-
-        @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
-            //设置图片大小
-            ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
-            params.height = heightList.get(position);
-            holder.itemView.setLayoutParams(params);
-
-            holder.iv.setImageBitmap(null);
-            //防止图片错位
-            holder.iv.setTag(dataList.get(position));
-            imageLoader.add(new MyImageLoader.ImageBean(holder.iv, dataList.get(position)));
-        }
-
-        @Override
-        public int getItemCount() {
-            return dataList.size();
-        }
-
-        class MyViewHolder extends RecyclerView.ViewHolder {
-            public ImageView iv;
-
-            public MyViewHolder(View itemView) {
-                super(itemView);
-                iv = (ImageView) itemView.findViewById(R.id.iv);
-            }
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_image_flow, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

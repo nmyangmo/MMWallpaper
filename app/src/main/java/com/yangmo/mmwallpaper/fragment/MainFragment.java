@@ -5,12 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.yangmo.mmwallpaper.R;
+import com.yangmo.mmwallpaper.adapter.FragmentViewPagerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,6 +37,7 @@ public class MainFragment extends Fragment {
     public MainFragment() {
         // Required empty public constructor
     }
+
     private ViewPager mainViewpager;
 
     /**
@@ -75,7 +78,13 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mainViewpager=view.findViewById(R.id.viewpager_main_activity);
+        mainViewpager = view.findViewById(R.id.viewpager_main_activity);
+        initView();
+    }
+
+    private void initView() {
+//        FragmentViewPagerAdapter
+        mainViewpager.setAdapter(new FragmentViewPagerAdapter(getFragmentManager(),2));
     }
 
     // TODO: Rename method, update argument and hook method into UI event
